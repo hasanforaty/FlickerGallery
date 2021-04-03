@@ -5,25 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hasan.foraty.photogallery.api.FlickrApi
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 private const val TAG="PhotoGalleryFragment"
-class PhotoGalleryFragment :Fragment() {
+class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
     private lateinit var photoRecyclerView:RecyclerView
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
+    private lateinit var gridLayoutManager: GridLayoutManager
 
     companion object{
         /**
@@ -43,7 +36,10 @@ class PhotoGalleryFragment :Fragment() {
         val view=inflater.inflate(R.layout.fragment_photo_gallery,container,false)
 
         photoRecyclerView=view.findViewById(R.id.photo_recycler_view)
-        photoRecyclerView.layoutManager=GridLayoutManager(context,3)
+        gridLayoutManager=GridLayoutManager(context,3)
+        photoRecyclerView.layoutManager=gridLayoutManager
+        Log.d(TAG, "onCreateView: addOnGlobalLayout")
+        photoRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(this)
         return view
     }
 
@@ -58,7 +54,7 @@ class PhotoGalleryFragment :Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        photoGalleryViewModel=ViewModelProviders.of(this).get(PhotoGalleryViewModel::class.java)
+        photoGalleryViewModel=ViewModelProvider(this).get(PhotoGalleryViewModel::class.java)
     }
 
 
@@ -82,18 +78,13 @@ class PhotoGalleryFragment :Fragment() {
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    override fun onGlobalLayout() {
+        Log.d(TAG, "onGlobalLayout: width = ${photoRecyclerView.width} , height = ${photoRecyclerView.height}")
+        val width=photoRecyclerView.width
+        val measure=360
+        val inSize=Math.round((width/measure).toDouble()).toInt()
+        gridLayoutManager.spanCount= inSize
+    }
 
 
 }

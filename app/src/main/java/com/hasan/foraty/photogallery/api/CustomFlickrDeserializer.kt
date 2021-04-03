@@ -27,7 +27,6 @@ class CustomFlickrDeserializer:JsonDeserializer<PhotoResponse> {
                }
            }
         }
-
         photoResponse.galleryItems=photos
         return photoResponse
     }

@@ -3,6 +3,8 @@ package com.hasan.foraty.photogallery
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.GsonBuilder
+import com.hasan.foraty.photogallery.api.CustomFlickrDeserializer
 import com.hasan.foraty.photogallery.api.FlickrApi
 import com.hasan.foraty.photogallery.api.FlickrResponse
 import com.hasan.foraty.photogallery.api.PhotoResponse
@@ -13,22 +15,34 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 private const val TAG="FlickrFetchr_repository"
-class FlickrFetchr_repository {
+class FlickrFetchrRepository {
     private val flickrApi:FlickrApi
     companion object{
-        fun newInstance():FlickrFetchr_repository{
-            return FlickrFetchr_repository()
+        fun newInstance():FlickrFetchrRepository{
+            return FlickrFetchrRepository()
         }
     }
     init {
         val spec:List<ConnectionSpec> = mutableListOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.MODERN_TLS)
         val client=OkHttpClient.Builder().connectionSpecs(spec).build()
+
+        //default method to Create DB
+//        val retrofit=Retrofit.Builder()
+//            .baseUrl("https://api.flickr.com/")
+//            .client(client)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+        //using custom Deserializer
+
+        val customGson =GsonBuilder()
+            .registerTypeAdapter(PhotoResponse::class.java,CustomFlickrDeserializer())
+            .create()
         val retrofit=Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
             .client(client)
+            .addConverterFactory(GsonConverterFactory.create(customGson))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         flickrApi=retrofit.create(FlickrApi::class.java)
@@ -42,13 +56,12 @@ class FlickrFetchr_repository {
                 Log.d(TAG,"response received")
                 val flickrResponse:FlickrResponse?=response.body()
                 val photoResponse:PhotoResponse?=flickrResponse?.photos
-                var galleryItems:List<GalleryItem> = photoResponse?.galleryItems ?: mutableListOf()
+                val galleryItems:List<GalleryItem> = photoResponse?.galleryItems ?: mutableListOf()
                 galleryItems.filterNot {
                     it.url.isEmpty()
                 }
                 result.value=galleryItems
             }
-
             override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
                 Log.e(TAG, "Failed to fetch photos", t)
             }
