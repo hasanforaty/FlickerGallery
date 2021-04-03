@@ -1,8 +1,9 @@
-package com.hasan.foraty.photogallery
+package com.hasan.foraty.photogallery.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.hasan.foraty.photogallery.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

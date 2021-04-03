@@ -1,7 +1,7 @@
 package com.hasan.foraty.photogallery.api
 
 import com.google.gson.annotations.SerializedName
-import com.hasan.foraty.photogallery.GalleryItem
+import com.hasan.foraty.photogallery.data.GalleryItem
 
 class PhotoResponse {
     @SerializedName("photo")

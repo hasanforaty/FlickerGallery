@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery
+package com.hasan.foraty.photogallery.data
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -20,7 +20,7 @@ private const val TAG="FlickrFetchr_repository"
 class FlickrFetchrRepository {
     private val flickrApi:FlickrApi
     companion object{
-        fun newInstance():FlickrFetchrRepository{
+        fun newInstance(): FlickrFetchrRepository {
             return FlickrFetchrRepository()
         }
     }

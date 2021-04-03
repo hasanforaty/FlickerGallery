@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery
+package com.hasan.foraty.photogallery.data
 
 import com.google.gson.annotations.SerializedName
 

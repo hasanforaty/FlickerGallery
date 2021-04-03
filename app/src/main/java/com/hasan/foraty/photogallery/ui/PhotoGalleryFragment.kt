@@ -1,16 +1,23 @@
-package com.hasan.foraty.photogallery
+package com.hasan.foraty.photogallery.ui
 
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hasan.foraty.photogallery.R
+import com.hasan.foraty.photogallery.data.GalleryItem
+import com.squareup.picasso.Picasso
 
 private const val TAG="PhotoGalleryFragment"
 class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
@@ -57,19 +64,23 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
         photoGalleryViewModel=ViewModelProvider(this).get(PhotoGalleryViewModel::class.java)
     }
 
-
-    private inner class PhotoHolder(itemTextView:TextView):RecyclerView.ViewHolder(itemTextView){
-        val bindingTitle: (CharSequence) -> Unit =itemTextView::setText
+    //ViewHolder for our Adapter
+    private inner class PhotoHolder(itemImageView:ImageView):RecyclerView.ViewHolder(itemImageView){
+//        val bindingTitle: (CharSequence) -> Unit =itemImageView::setContentDescription
+        val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
     }
+    //adapter for our RecyclerView
     private inner class PhotoAdapter(private val galleryItems:List<GalleryItem>):RecyclerView.Adapter<PhotoHolder>(){
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
-            val textView=TextView(parent.context)
-            return PhotoHolder(textView)
+            val imageView=layoutInflater.inflate(R.layout.list_item,parent,false)
+            return PhotoHolder(imageView as ImageView)
         }
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem=galleryItems[position]
-            holder.bindingTitle(galleryItem.title)
+            val placeHolder: Drawable =ContextCompat
+                .getDrawable(requireContext(),R.drawable.pre_pic_foreground) ?:ColorDrawable()
+            holder.bindDrawable(placeHolder)
         }
 
         override fun getItemCount(): Int {
@@ -78,6 +89,7 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
 
     }
 
+    //dynamic chose of number of column base on Screen Size
     override fun onGlobalLayout() {
         Log.d(TAG, "onGlobalLayout: width = ${photoRecyclerView.width} , height = ${photoRecyclerView.height}")
         val width=photoRecyclerView.width
