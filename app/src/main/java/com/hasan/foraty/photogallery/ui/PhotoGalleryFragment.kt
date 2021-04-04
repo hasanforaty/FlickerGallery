@@ -1,15 +1,16 @@
 package com.hasan.foraty.photogallery.ui
 
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,13 +18,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hasan.foraty.photogallery.R
 import com.hasan.foraty.photogallery.data.GalleryItem
-import com.squareup.picasso.Picasso
+import com.hasan.foraty.photogallery.data.ThumbnailDownloader
+import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
 class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
     private lateinit var photoRecyclerView:RecyclerView
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
     private lateinit var gridLayoutManager: GridLayoutManager
+    private lateinit var thumbnailDownloader: ThumbnailDownloader<PhotoHolder>
 
     companion object{
         /**
@@ -56,12 +59,33 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
             viewLifecycleOwner){galleryItems ->
                 photoRecyclerView.adapter=PhotoAdapter(galleryItems)
             }
+
+        //add an observer to our viewLifecycle from ThumbnailDownloader
+        // class in onViewCreated method
+        viewLifecycleOwner.lifecycle.addObserver(
+            thumbnailDownloader.viewLifecycleObserver
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //retain fragment in config changes
+        retainInstance=true
+        //instantiate PhotoGalleryViewModel
         photoGalleryViewModel=ViewModelProvider(this).get(PhotoGalleryViewModel::class.java)
+        //instantiate ThumbnailDownloader
+        val responseHandler=Handler()
+        thumbnailDownloader= ThumbnailDownloader(responseHandler){ photoHolder,bitmap ->
+            val drawable = BitmapDrawable(resources,bitmap)
+            photoHolder.bindDrawable(drawable)
+        }
+
+        //add an observer to our fragment lifecycle from
+        // ThumbnailDownloader class in onCreate Method
+        lifecycle.addObserver(
+            thumbnailDownloader.fragmentLifecycleObserver
+        )
     }
 
     //ViewHolder for our Adapter
@@ -81,6 +105,7 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
             val placeHolder: Drawable =ContextCompat
                 .getDrawable(requireContext(),R.drawable.pre_pic_foreground) ?:ColorDrawable()
             holder.bindDrawable(placeHolder)
+            thumbnailDownloader.queueThumbnail(holder,galleryItem.url)
         }
 
         override fun getItemCount(): Int {
@@ -94,9 +119,24 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
         Log.d(TAG, "onGlobalLayout: width = ${photoRecyclerView.width} , height = ${photoRecyclerView.height}")
         val width=photoRecyclerView.width
         val measure=360
-        val inSize=Math.round((width/measure).toDouble()).toInt()
+        var inSize= (width / measure).toDouble().roundToInt()
+       if (inSize>=3){
+           inSize--
+       }
         gridLayoutManager.spanCount= inSize
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(
+            thumbnailDownloader.fragmentLifecycleObserver
+        )
+    }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewLifecycleOwner.lifecycle.removeObserver(
+            thumbnailDownloader.viewLifecycleObserver
+        )
+    }
 }

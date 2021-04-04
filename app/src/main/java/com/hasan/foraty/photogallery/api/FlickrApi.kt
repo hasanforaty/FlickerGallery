@@ -1,7 +1,9 @@
 package com.hasan.foraty.photogallery.api
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Url
 
 private const val KEY="79a7ec7cf5534f877d2d11d9a2ee2e30"
 /**
@@ -20,4 +22,6 @@ interface FlickrApi {
                 "&nojsoncallback=1" +
                 "&extras=url_s")
     fun fetchPhoto(): Call<FlickrResponse>
+    @GET
+    fun fetchUrlBytes(@Url url:String):Call<ResponseBody>
 }
