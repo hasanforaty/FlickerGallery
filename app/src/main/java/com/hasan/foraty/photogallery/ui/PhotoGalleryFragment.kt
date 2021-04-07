@@ -14,6 +14,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hasan.foraty.photogallery.R
@@ -62,9 +63,17 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
 
         //add an observer to our viewLifecycle from ThumbnailDownloader
         // class in onViewCreated method
+        /*
         viewLifecycleOwner.lifecycle.addObserver(
             thumbnailDownloader.viewLifecycleObserver
         )
+         */
+        viewLifecycleOwnerLiveData.observe(viewLifecycleOwner){viewLifecycleOwner ->
+            viewLifecycleOwner.lifecycle.addObserver(
+                    thumbnailDownloader.viewLifecycleObserver
+            )
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -6,6 +6,8 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
+import android.util.LruCache
+import androidx.core.util.lruCache
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -57,6 +59,8 @@ class ThumbnailDownloader<in T>(
     private val repository=FlickrFetchrRepository()
     private val requestMap = ConcurrentHashMap<T,String>()
     private lateinit var requestHandler:Handler
+    // instance of LruCache for saving last 100 pic in lruCache
+    private val cache = lruCache<String,Bitmap>(100)
     //override method to change hasQuit when leaving Handler
     override fun quit(): Boolean {
         hasQuit=true
@@ -86,6 +90,7 @@ class ThumbnailDownloader<in T>(
             requestMap.remove(target)
             onThumbnailDownloader(target,bitmap)
         })
+        cache.put(url,bitmap)
     }
     /**
      * @param target ui Target of our Url
@@ -95,8 +100,22 @@ class ThumbnailDownloader<in T>(
         Log.i(TAG, "queueThumnail: got Url = $url")
 
         requestMap[target]=url
+        /*
+        when we have image in cache
+         */
+        cache.get(url)?.let {
+            responseHandler.post(Runnable {
+                if (hasQuit){
+                    return@Runnable
+                }
+                requestMap.remove(target)
+                onThumbnailDownloader(target,it)
+            })
+            return
+        }
         requestHandler.obtainMessage(MESSAGE_DOWNLOAD,target)
             .sendToTarget()
 
     }
+
 }
