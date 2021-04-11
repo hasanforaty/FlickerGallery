@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -116,15 +117,16 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
     }
 
     //ViewHolder for our Adapter
-    private inner class PhotoHolder(itemImageView:ImageView):RecyclerView.ViewHolder(itemImageView){
+    private inner class PhotoHolder(view:View):RecyclerView.ViewHolder(view){
 //        val bindingTitle: (CharSequence) -> Unit =itemImageView::setContentDescription
+        val  itemImageView:ImageView = view.findViewById(R.id.image)
         val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
     }
     //adapter for our RecyclerView
     private inner class PhotoAdapter(private val galleryItems:List<GalleryItem>):RecyclerView.Adapter<PhotoHolder>(){
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
-            val imageView=layoutInflater.inflate(R.layout.list_item,parent,false)
-            return PhotoHolder(imageView as ImageView)
+            val cardView=layoutInflater.inflate(R.layout.list_item,parent,false)
+            return PhotoHolder(cardView)
         }
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
