@@ -7,10 +7,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.GsonBuilder
-import com.hasan.foraty.photogallery.api.CustomFlickrDeserializer
-import com.hasan.foraty.photogallery.api.FlickrApi
-import com.hasan.foraty.photogallery.api.FlickrResponse
-import com.hasan.foraty.photogallery.api.PhotoResponse
+import com.hasan.foraty.photogallery.api.*
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -30,7 +27,10 @@ class FlickrFetchrRepository {
     }
     init {
         val spec:List<ConnectionSpec> = mutableListOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.MODERN_TLS)
-        val client=OkHttpClient.Builder().connectionSpecs(spec).build()
+        val client=OkHttpClient.Builder()
+                .addInterceptor(PhotoInterceptor())
+                .connectionSpecs(spec)
+                .build()
 
         //default method to Create DB
 //        val retrofit=Retrofit.Builder()
@@ -51,10 +51,14 @@ class FlickrFetchrRepository {
             .build()
         flickrApi=retrofit.create(FlickrApi::class.java)
     }
-
     fun fetchPhoto():LiveData<List<GalleryItem>>{
+        return fetchPhotoMetadata(flickrApi.fetchPhoto())
+    }
+    fun searchPhotos(query:String):LiveData<List<GalleryItem>>{
+        return fetchPhotoMetadata(flickrApi.searchPhotos(query))
+    }
+    private fun fetchPhotoMetadata(flickrRequest:Call<FlickrResponse>):LiveData<List<GalleryItem>>{
         val result= MutableLiveData<List<GalleryItem>>()
-        val flickrRequest=flickrApi.fetchPhoto()
         flickrRequest.enqueue(object : Callback<FlickrResponse>{
             override fun onResponse(call: Call<FlickrResponse>, response: Response<FlickrResponse>) {
                 Log.d(TAG,"response received")
