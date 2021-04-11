@@ -20,6 +20,6 @@ interface FlickrApi {
     fun fetchPhoto(): Call<FlickrResponse>
     @GET
     fun fetchUrlBytes(@Url url:String):Call<ResponseBody>
-    @GET("services/rest?method=flickr.photos.search")
+    @GET("services/rest/?method=flickr.photos.search")
     fun searchPhotos(@Query("text")query:String):Call<FlickrResponse>
 }

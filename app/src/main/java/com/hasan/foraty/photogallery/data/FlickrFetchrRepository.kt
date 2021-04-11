@@ -78,7 +78,7 @@ class FlickrFetchrRepository {
     }
 
     @WorkerThread
-    fun fetchPhoto(url:String):Bitmap?{
+    fun fetchPhotoWithUrl(url:String):Bitmap?{
         val response:Response<ResponseBody> = flickrApi.fetchUrlBytes(url).execute()
         val bitmap = response.body()?.byteStream()?.use (BitmapFactory::decodeStream)
         Log.i(TAG, "fetchPhoto: Decode Bitmap=$bitmap from Response = $response")

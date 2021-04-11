@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
-import android.util.LruCache
 import androidx.core.util.lruCache
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -81,7 +80,7 @@ class ThumbnailDownloader<in T>(
     }
     private fun handleRequest(target: T){
         val url = requestMap[target] ?:return
-        val bitmap = repository.fetchPhoto(url) ?: return
+        val bitmap = repository.fetchPhotoWithUrl(url) ?: return
 
         responseHandler.post(Runnable {
             if (requestMap[target]!=url || hasQuit){

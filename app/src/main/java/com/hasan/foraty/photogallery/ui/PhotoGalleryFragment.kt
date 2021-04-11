@@ -6,15 +6,12 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.widget.ImageView
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hasan.foraty.photogallery.R
@@ -23,7 +20,7 @@ import com.hasan.foraty.photogallery.data.ThumbnailDownloader
 import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
-class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
+class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
     private lateinit var photoRecyclerView:RecyclerView
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
     private lateinit var gridLayoutManager: GridLayoutManager
@@ -95,6 +92,27 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
         lifecycle.addObserver(
             thumbnailDownloader.fragmentLifecycleObserver
         )
+        //activating menu
+        setHasOptionsMenu(true)
+    }
+    //inflate menu with created menu
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_photo_gallery_menu,menu)
+        val searchView=menu.findItem(R.id.menu_search).actionView as SearchView
+        //add listener to search action bar
+        searchView.setOnQueryTextListener(this)
+    }
+
+    //dynamic chose of number of column base on Screen Size
+    override fun onGlobalLayout() {
+        Log.d(TAG, "onGlobalLayout: width = ${photoRecyclerView.width} , height = ${photoRecyclerView.height}")
+        val width=photoRecyclerView.width
+        val measure=360
+        var inSize= (width / measure).toDouble().roundToInt()
+        if (inSize>=3){
+            inSize--
+        }
+        gridLayoutManager.spanCount= inSize
     }
 
     //ViewHolder for our Adapter
@@ -123,17 +141,7 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
 
     }
 
-    //dynamic chose of number of column base on Screen Size
-    override fun onGlobalLayout() {
-        Log.d(TAG, "onGlobalLayout: width = ${photoRecyclerView.width} , height = ${photoRecyclerView.height}")
-        val width=photoRecyclerView.width
-        val measure=360
-        var inSize= (width / measure).toDouble().roundToInt()
-       if (inSize>=3){
-           inSize--
-       }
-        gridLayoutManager.spanCount= inSize
-    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -147,5 +155,18 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener {
         viewLifecycleOwner.lifecycle.removeObserver(
             thumbnailDownloader.viewLifecycleObserver
         )
+    }
+    //doing search for subject enter in search box
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        Log.d(TAG, "onQueryTextSubmit: query: $query")
+        query?.let { query ->
+            photoGalleryViewModel.searchPhoto(query)
+        }
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        Log.d(TAG, "onQueryTextChange: text change to $newText")
+        return false
     }
 }
