@@ -102,6 +102,12 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
         val searchView=menu.findItem(R.id.menu_search).actionView as SearchView
         //add listener to search action bar
         searchView.setOnQueryTextListener(this)
+        //adding last search to search widget
+        val searchText=photoGalleryViewModel.searchText
+        if (searchText.isNotEmpty()){
+            //make sure to don't submit , only add the text
+            searchView.setQuery(searchText,false)
+        }
     }
 
     //dynamic chose of number of column base on Screen Size
@@ -170,5 +176,15 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
     override fun onQueryTextChange(newText: String?): Boolean {
         Log.d(TAG, "onQueryTextChange: text change to $newText")
         return false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.menu_item_clear ->{
+                photoGalleryViewModel.searchPhoto("")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
