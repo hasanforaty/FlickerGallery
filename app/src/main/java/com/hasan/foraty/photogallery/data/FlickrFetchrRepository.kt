@@ -3,6 +3,7 @@ package com.hasan.foraty.photogallery.data
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -51,12 +52,19 @@ class FlickrFetchrRepository {
             .build()
         flickrApi=retrofit.create(FlickrApi::class.java)
     }
+    fun fetchPhotosRequest(): Call<FlickrResponse> {
+        return flickrApi.fetchPhoto()
+    }
+    fun searchPhotosRequest(query: String): Call<FlickrResponse> {
+        return flickrApi.searchPhotos(query)
+    }
     fun fetchPhoto():LiveData<List<GalleryItem>>{
-        return fetchPhotoMetadata(flickrApi.fetchPhoto())
+        return fetchPhotoMetadata(fetchPhotosRequest())
     }
     fun searchPhotos(query:String):LiveData<List<GalleryItem>>{
-        return fetchPhotoMetadata(flickrApi.searchPhotos(query))
+        return fetchPhotoMetadata(searchPhotosRequest(query))
     }
+
     private fun fetchPhotoMetadata(flickrRequest:Call<FlickrResponse>):LiveData<List<GalleryItem>>{
         val result= MutableLiveData<List<GalleryItem>>()
         flickrRequest.enqueue(object : Callback<FlickrResponse>{
@@ -72,6 +80,7 @@ class FlickrFetchrRepository {
             }
             override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
                 Log.e(TAG, "Failed to fetch photos", t)
+
             }
         })
         return result

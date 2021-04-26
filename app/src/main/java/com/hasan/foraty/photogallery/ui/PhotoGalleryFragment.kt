@@ -15,9 +15,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
+import androidx.work.impl.WorkManagerInitializer
 import com.hasan.foraty.photogallery.R
 import com.hasan.foraty.photogallery.data.GalleryItem
+import com.hasan.foraty.photogallery.data.PollWorker
 import com.hasan.foraty.photogallery.data.ThumbnailDownloader
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
@@ -95,6 +99,20 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
         )
         //activating menu
         setHasOptionsMenu(true)
+        //creating condition for our worker
+        val constraint = Constraints
+            .Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
+        //creating work Request
+        val workRequest = OneTimeWorkRequest
+            .Builder(PollWorker::class.java)
+            .setConstraints(constraint)
+            .build()
+        //run the worker
+        WorkManager.getInstance().enqueue(workRequest)
+
+
     }
     //inflate menu with created menu
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
