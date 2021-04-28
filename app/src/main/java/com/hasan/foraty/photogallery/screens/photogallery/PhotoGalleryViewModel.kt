@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery.ui
+package com.hasan.foraty.photogallery.screens.photogallery
 
 import android.app.Application
 import android.content.Context

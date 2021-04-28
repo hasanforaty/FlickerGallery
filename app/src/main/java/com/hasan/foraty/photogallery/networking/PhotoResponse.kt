@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery.api
+package com.hasan.foraty.photogallery.networking
 
 import com.google.gson.annotations.SerializedName
 import com.hasan.foraty.photogallery.data.GalleryItem

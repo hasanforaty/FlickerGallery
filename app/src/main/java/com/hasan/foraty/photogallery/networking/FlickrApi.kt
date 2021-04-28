@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery.api
+package com.hasan.foraty.photogallery.networking
 
 import okhttp3.ResponseBody
 import retrofit2.Call
