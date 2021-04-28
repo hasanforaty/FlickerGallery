@@ -9,28 +9,22 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
-import androidx.work.impl.WorkManagerInitializer
 import com.hasan.foraty.photogallery.R
 import com.hasan.foraty.photogallery.data.GalleryItem
 import com.hasan.foraty.photogallery.data.PollWorker
 import com.hasan.foraty.photogallery.data.ThumbnailDownloader
 import com.hasan.foraty.photogallery.screens.common.fragment.BaseFragment
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
-class PhotoGalleryFragment :BaseFragment(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
-    private lateinit var photoRecyclerView:RecyclerView
+class PhotoGalleryFragment :BaseFragment(), SearchView.OnQueryTextListener {
+
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
-    private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var thumbnailDownloader: ThumbnailDownloader<PhotoHolder>
+    private lateinit var viewMvc: PhotoGalleryMvc
 
     companion object{
         /**
@@ -47,21 +41,15 @@ class PhotoGalleryFragment :BaseFragment(),ViewTreeObserver.OnGlobalLayoutListen
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view=inflater.inflate(R.layout.fragment_photo_gallery,container,false)
-
-        photoRecyclerView=view.findViewById(R.id.photo_recycler_view)
-        gridLayoutManager=GridLayoutManager(context,3)
-        photoRecyclerView.layoutManager=gridLayoutManager
-        Log.d(TAG, "onCreateView: addOnGlobalLayout")
-        photoRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(this)
-        return view
+        viewMvc=compositionRoot.viewMvc.newPhotoGalleryMvc(container)
+        return viewMvc.rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         photoGalleryViewModel.galleryItemLiveData.observe(
             viewLifecycleOwner){galleryItems ->
-                photoRecyclerView.adapter=PhotoAdapter(galleryItems)
+                viewMvc.photoRecyclerView.adapter=PhotoAdapter(galleryItems)
             }
 
         //add an observer to our viewLifecycle from ThumbnailDownloader
@@ -129,17 +117,7 @@ class PhotoGalleryFragment :BaseFragment(),ViewTreeObserver.OnGlobalLayoutListen
         }
     }
 
-    //dynamic chose of number of column base on Screen Size
-    override fun onGlobalLayout() {
-        Log.d(TAG, "onGlobalLayout: width = ${photoRecyclerView.width} , height = ${photoRecyclerView.height}")
-        val width=photoRecyclerView.width
-        val measure=360
-        var inSize= (width / measure).toDouble().roundToInt()
-        if (inSize>=3){
-            inSize--
-        }
-        gridLayoutManager.spanCount= inSize
-    }
+
 
     //ViewHolder for our Adapter
     private inner class PhotoHolder(view:View):RecyclerView.ViewHolder(view){

@@ -5,7 +5,7 @@
 
     <application
         android:allowBackup="true"
-        android:name=".common.notification.PhotoGalleryApplication"
+        android:name=".PhotoGalleryApplication"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
