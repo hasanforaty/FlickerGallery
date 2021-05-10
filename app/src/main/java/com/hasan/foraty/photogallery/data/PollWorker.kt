@@ -9,12 +9,12 @@ import androidx.work.WorkerParameters
  * PollWorker class
  */
 private const val TAG = "PollWorker"
-class PollWorker(context: Context, workerParameters: WorkerParameters)
+class PollWorker(private val context: Context, workerParameters: WorkerParameters)
     :Worker(context,workerParameters) {
     override fun doWork(): Result {
         val repository=FlickrFetchrRepository.newInstance()
-        val queryText = QueryPreference.getStoredQuery(context = applicationContext)
-        val firstPicId = QueryPreference.getStoredFirstId(context = applicationContext)
+        val queryText = QueryPreference.getStoredQuery(context = context)
+        val firstPicId = QueryPreference.getStoredFirstId(context = context)
         val galleryItems : List<GalleryItem> =
             if (queryText.isEmpty()){
                 repository

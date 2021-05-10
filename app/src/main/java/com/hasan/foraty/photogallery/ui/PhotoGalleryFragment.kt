@@ -110,7 +110,7 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
             .setConstraints(constraint)
             .build()
         //run the worker
-        WorkManager.getInstance().enqueue(workRequest)
+        WorkManager.getInstance(requireContext()).enqueue(workRequest)
 
 
     }
