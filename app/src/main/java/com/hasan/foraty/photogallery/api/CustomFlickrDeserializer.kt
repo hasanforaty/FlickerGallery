@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery.networking
+package com.hasan.foraty.photogallery.api
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -12,7 +12,7 @@ class CustomFlickrDeserializer:JsonDeserializer<PhotoResponse> {
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): PhotoResponse {
-        val photoResponse= PhotoResponse()
+        val photoResponse=PhotoResponse()
         val photos:MutableList<GalleryItem> = mutableListOf()
         json?.let {
            it.asJsonObject?.let {

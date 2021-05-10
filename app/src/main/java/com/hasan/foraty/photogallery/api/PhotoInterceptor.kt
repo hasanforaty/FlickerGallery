@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery.networking
+package com.hasan.foraty.photogallery.api
 
 import android.util.Log
 import okhttp3.HttpUrl

@@ -1,4 +1,4 @@
-package com.hasan.foraty.photogallery.screens.photogallery
+package com.hasan.foraty.photogallery.ui
 
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
@@ -21,12 +21,11 @@ import com.hasan.foraty.photogallery.R
 import com.hasan.foraty.photogallery.data.GalleryItem
 import com.hasan.foraty.photogallery.data.PollWorker
 import com.hasan.foraty.photogallery.data.ThumbnailDownloader
-import com.hasan.foraty.photogallery.screens.common.fragment.BaseFragment
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
-class PhotoGalleryFragment :BaseFragment(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
+class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
     private lateinit var photoRecyclerView:RecyclerView
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
     private lateinit var gridLayoutManager: GridLayoutManager

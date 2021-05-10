@@ -3,11 +3,12 @@ package com.hasan.foraty.photogallery.data
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.GsonBuilder
-import com.hasan.foraty.photogallery.networking.*
+import com.hasan.foraty.photogallery.api.*
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -19,7 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 private const val TAG="FlickrFetchr_repository"
 class FlickrFetchrRepository {
-    private val flickrApi: FlickrApi
+    private val flickrApi:FlickrApi
     companion object{
         fun newInstance(): FlickrFetchrRepository {
             return FlickrFetchrRepository()
@@ -41,7 +42,7 @@ class FlickrFetchrRepository {
         //using custom Deserializer
 
         val customGson =GsonBuilder()
-            .registerTypeAdapter(PhotoResponse::class.java, CustomFlickrDeserializer())
+            .registerTypeAdapter(PhotoResponse::class.java,CustomFlickrDeserializer())
             .create()
         val retrofit=Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
@@ -69,8 +70,8 @@ class FlickrFetchrRepository {
         flickrRequest.enqueue(object : Callback<FlickrResponse>{
             override fun onResponse(call: Call<FlickrResponse>, response: Response<FlickrResponse>) {
                 Log.d(TAG,"response received")
-                val flickrResponse: FlickrResponse?=response.body()
-                val photoResponse: PhotoResponse?=flickrResponse?.photos
+                val flickrResponse:FlickrResponse?=response.body()
+                val photoResponse:PhotoResponse?=flickrResponse?.photos
                 val galleryItems:List<GalleryItem> = photoResponse?.galleryItems ?: mutableListOf()
                 galleryItems.filterNot {
                     it.url.isEmpty()
