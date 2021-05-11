@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 
 private const val PREF_QUERY_SEARCH="searchQuery"
 private const val PREF_LAST_ID = "lastId"
+private const val PREF_IS_POLLING = "isPolling"
 
 /**
  * Object to store and retrieve query from SharedPreferences
@@ -53,4 +54,17 @@ object QueryPreference{
             .putString(PREF_LAST_ID,id)
             .apply()
     }
+
+    fun isPolling(context: Context):Boolean{
+        return context.getSharedPreferences(PREF_IS_POLLING,Context.MODE_PRIVATE)
+            .getBoolean(PREF_IS_POLLING,false)
+    }
+    fun setPolling(context: Context,polling:Boolean){
+        context.getSharedPreferences(PREF_IS_POLLING,Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(PREF_IS_POLLING,polling)
+            .apply()
+    }
+
+
 }

@@ -5,4 +5,6 @@
     <string name="notification_channel_default_name">Last Search Pic</string>
     <string name="new_picture_title">new PhotoGalley Photo</string>
     <string name="new_picture_content">you have new Pictures in PhotoGallery</string>
+    <string name="start_polling">Enable Background notification</string>
+    <string name="stop_polling">Disable Background notification</string>
 </resources>

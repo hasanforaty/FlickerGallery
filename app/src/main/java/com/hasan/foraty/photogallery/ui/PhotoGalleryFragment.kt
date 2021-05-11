@@ -20,11 +20,13 @@ import androidx.work.impl.WorkManagerInitializer
 import com.hasan.foraty.photogallery.R
 import com.hasan.foraty.photogallery.data.GalleryItem
 import com.hasan.foraty.photogallery.data.PollWorker
+import com.hasan.foraty.photogallery.data.QueryPreference
 import com.hasan.foraty.photogallery.data.ThumbnailDownloader
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
+private const val WORKER_POLL_TAG = "Poll Work"
 class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
     private lateinit var photoRecyclerView:RecyclerView
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
@@ -99,18 +101,7 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
         )
         //activating menu
         setHasOptionsMenu(true)
-        //creating condition for our worker
-        val constraint = Constraints
-            .Builder()
-            .setRequiredNetworkType(NetworkType.UNMETERED)
-            .build()
-        //creating work Request
-        val workRequest = OneTimeWorkRequest
-            .Builder(PollWorker::class.java)
-            .setConstraints(constraint)
-            .build()
-        //run the worker
-        WorkManager.getInstance(requireContext()).enqueue(workRequest)
+
 
 
     }
@@ -126,6 +117,16 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
             //make sure to don't submit , only add the text
             searchView.setQuery(searchText,false)
         }
+
+        val togglePolling = menu.findItem(R.id.menu_item_toggle_polling)
+        val pollingStatue = QueryPreference.isPolling(requireContext())
+        val pollingTitle=if (pollingStatue){
+            R.string.stop_polling
+        }else{
+            R.string.start_polling
+        }
+        togglePolling.title = getString(pollingTitle)
+
     }
 
     //dynamic chose of number of column base on Screen Size
@@ -200,6 +201,35 @@ class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, 
         return when(item.itemId){
             R.id.menu_item_clear ->{
                 photoGalleryViewModel.searchPhoto("")
+                true
+            }
+            R.id.menu_item_toggle_polling -> {
+                val pollStatue = QueryPreference.isPolling(requireContext())
+                if (pollStatue) {
+                    WorkManager.getInstance(requireContext()).cancelUniqueWork(WORKER_POLL_TAG)
+                    QueryPreference.setPolling(requireContext(), false)
+
+                } else {
+                    //creating condition for our worker
+                    val constraint = Constraints
+                        .Builder()
+                        .setRequiredNetworkType(NetworkType.UNMETERED)
+                        .build()
+                    //creating work Request
+                    val workRequest = PeriodicWorkRequest
+                        .Builder(PollWorker::class.java, 15, TimeUnit.MINUTES)
+                        .setConstraints(constraint)
+                        .build()
+                    //run the worker
+                    WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+                        WORKER_POLL_TAG,
+                        ExistingPeriodicWorkPolicy.KEEP,
+                        workRequest
+                    )
+                    QueryPreference.setPolling(requireContext(), true)
+
+                }
+                activity?.invalidateOptionsMenu()
                 true
             }
             else -> super.onOptionsItemSelected(item)
