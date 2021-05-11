@@ -2,4 +2,7 @@
     <string name="app_name">PhotoGallery</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear Search</string>
+    <string name="notification_channel_default_name">Last Search Pic</string>
+    <string name="new_picture_title">new PhotoGalley Photo</string>
+    <string name="new_picture_content">you have new Pictures in PhotoGallery</string>
 </resources>
