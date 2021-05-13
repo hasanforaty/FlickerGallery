@@ -22,12 +22,13 @@ import com.hasan.foraty.photogallery.data.GalleryItem
 import com.hasan.foraty.photogallery.data.PollWorker
 import com.hasan.foraty.photogallery.data.QueryPreference
 import com.hasan.foraty.photogallery.data.ThumbnailDownloader
+import com.hasan.foraty.photogallery.service.VisibleFragmentReceiver
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 private const val TAG="PhotoGalleryFragment"
 private const val WORKER_POLL_TAG = "Poll Work"
-class PhotoGalleryFragment :Fragment(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
+class PhotoGalleryFragment :VisibleFragmentReceiver(),ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
     private lateinit var photoRecyclerView:RecyclerView
     private lateinit var photoGalleryViewModel:PhotoGalleryViewModel
     private lateinit var gridLayoutManager: GridLayoutManager

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hasan.foraty.photogallery">
+    
+    <permission android:name="com.hasan.foraty.photogallery.PRIVATE" android:protectionLevel="signature"/>
+    
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.hasan.foraty.photogallery.PRIVATE"/>
 
     <application
         android:allowBackup="true"
@@ -19,6 +23,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".service.NotificationReceiver"
+            android:permission="com.hasan.foraty.photogallery.PRIVATE"
+            android:exported="false"
+            >
+            <intent-filter
+                android:priority="-999"
+                >
+                <action android:name="com.hasan.foraty.photogallery.data.SHOW_NOTIFICATION"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

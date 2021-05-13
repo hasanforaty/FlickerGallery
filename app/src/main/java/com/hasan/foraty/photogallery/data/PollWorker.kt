@@ -1,9 +1,11 @@
 package com.hasan.foraty.photogallery.data
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.util.LogPrinter
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -72,14 +74,34 @@ class PollWorker(private val context: Context, workerParameters: WorkerParameter
                 .setAutoCancel(true)
                 .build()
 
-            val notificationManager = NotificationManagerCompat.from(context)
-
-            notificationManager.notify(NOTIFICATION_ID,notification)
+            showBackgroundNotification(0,notification)
 
         }
 
 
         return Result.success()
+    }
+
+
+    fun showBackgroundNotification(
+        requestCode : Int ,
+        notification:Notification
+    ){
+        val intent = Intent(ACTION_SHOW_NOTIFICATION).apply {
+            putExtra(REQUEST_CODE,requestCode)
+            putExtra(NOTIFICATION,notification)
+        }
+
+        context.sendOrderedBroadcast(intent, PRIVATE_PERMISION)
+
+    }
+
+    companion object{
+        const val ACTION_SHOW_NOTIFICATION =
+            "com.hasan.foraty.photogallery.data.SHOW_NOTIFICATION"
+        const val PRIVATE_PERMISION = "com.hasan.foraty.photogallery.PRIVATE"
+        const val REQUEST_CODE = "Request_code"
+        const val NOTIFICATION = "Notification"
     }
 
 }
